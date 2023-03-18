@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const Pong = () => {
-  const canvasWidth = 800;
-  const canvasHeight = 600;
-  const paddleWidth = 15;
-  const paddleHeight = 100;
-  const ballRadius = 7;
-  const playerPaddleSpeed = 5;
-  const aiPaddleSpeed = 2;
+  let canvasWidth = 800;
+  let canvasHeight = 600;
+  let paddleWidth = canvasWidth * 0.02; // Adjust the value as needed
+  let paddleHeight = canvasHeight / 5; // Adjust the value as needed
+  let ballRadius = canvasHeight * 0.015; // Adjust the value as needed
+  let playerPaddleSpeed = 5;
+  let aiPaddleSpeed = 2;
 
   // Game state and logic here
   const ball = useRef({ x: canvasWidth / 2, y: canvasHeight / 2, dx: 2, dy: 2 });
@@ -19,7 +19,30 @@ const Pong = () => {
   const canvasRef = useRef(null);
   const timeoutId = useRef(null);
   const scoreUpdated = useRef(false);
+  const keys = useRef({});
 
+  const resizeCanvas = () => {
+    canvasRef.current.width = window.innerWidth * 0.9;
+    canvasRef.current.height = window.innerHeight * 0.9;
+    canvasWidth = canvasRef.current.width;
+    canvasHeight = canvasRef.current.height;
+    paddleHeight = canvasHeight / 5;
+
+    ballRadius = canvasHeight * 0.015; // Adjust the value as needed
+    paddleWidth = canvasWidth * 0.02; // Adjust the value as needed
+    paddleHeight = canvasHeight / 5; // Adjust the value as needed
+  };
+
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    keys.current['KeyW'] = true;
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    keys.current['KeyW'] = false;
+  };
+  
 
   const handleKeyDown = (event) => {
     if (event.key === 'ArrowUp') {
@@ -168,7 +191,23 @@ if (ball.current.x - ballRadius <= 0) {
 };
 
 useEffect(() => {
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
   requestAnimationFrame(gameLoop);
+
+  canvasRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+  canvasRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+  // Clean up the event listeners and cancel the animation frame when the component is unmounted
+  return () => {
+    window.removeEventListener('resize', resizeCanvas);
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
+    //cancelAnimationFrame(animationFrameId.current);
+
+    canvasRef.current.removeEventListener('touchstart', handleTouchStart);
+    canvasRef.current.removeEventListener('touchend', handleTouchEnd);
+  };
 }, []);
   
   return (
