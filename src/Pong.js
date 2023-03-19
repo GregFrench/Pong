@@ -14,7 +14,6 @@ const Pong = () => {
   const paddle1 = useRef({ y: (canvasHeight - paddleHeight) / 2, dy: 0 });
   const paddle2 = useRef({ y: (canvasHeight - paddleHeight) / 2, dy: 0 });
   const score = useRef({ player1: 0, player2: 0 });
-  const [ballOutOfPlay, setBallOutOfPlay] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const canvasRef = useRef(null);
   const timeoutId = useRef(null);
@@ -103,10 +102,8 @@ if (ball.current.x - ballRadius <= 0) {
   if (!isPaused && !scoreUpdated.current) {
     setIsPaused(true);
     scoreUpdated.current = true;
-    setBallOutOfPlay(true);
     setTimeout(() => {
       resetBall(2);
-      setBallOutOfPlay(false);
       setIsPaused(false);
       scoreUpdated.current = false;
     }, 500);
@@ -116,10 +113,8 @@ if (ball.current.x - ballRadius <= 0) {
   if (!isPaused && !scoreUpdated.current) {
     setIsPaused(true);
     scoreUpdated.current = true;
-    setBallOutOfPlay(true);
     setTimeout(() => {
       resetBall(1);
-      setBallOutOfPlay(false);
       setIsPaused(false);
       scoreUpdated.current = false;
     }, 500);
